@@ -10,9 +10,6 @@ import "../coffeecore/Ownable.sol";
 // Define a contract 'Supplychain'
 contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole, Ownable {
 
-  // Define 'owner'
-  address owner;
-
   // Define a variable called 'upc' for Universal Product Code (UPC)
   uint  upc;
 
@@ -70,12 +67,6 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
   event Received(uint upc);
   event Purchased(uint upc);
 
-  // Define a modifer that checks to see if msg.sender == owner of the contract
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
   // Define a modifer that verifies the Caller
   modifier verifyCaller (address _address) {
     require(msg.sender == _address);
@@ -129,7 +120,7 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
 
   // Define a modifier that checks if an item.state of a upc is Shipped
   modifier shipped(uint _upc) {
-    require(items[_upc].itemState == State.Shippped);
+    require(items[_upc].itemState == State.Shipped);
     _;
   }
 
@@ -149,31 +140,30 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
   // and set 'sku' to 1
   // and set 'upc' to 1
   constructor()
-    public
     payable
     ConsumerRole()
     DistributorRole()
     FarmerRole()
     RetailerRole()
     Ownable() {
-    owner = msg.sender;
     sku = 1;
     upc = 1;
   }
 
-  // Define a function 'kill' if required
-  function kill() public {
-    if (msg.sender == owner) {
-      selfdestruct(owner);
-    }
-  }
-
   // Define a function 'harvestItem' that allows a farmer to mark an item 'Harvested'
-  function harvestItem(uint _upc, address _originFarmerID, string _originFarmName, string _originFarmInformation, string  _originFarmLatitude, string  _originFarmLongitude, string  _productNotes) public
+  function harvestItem(
+    uint _upc,
+    address _originFarmerID,
+    string memory _originFarmName,
+    string memory _originFarmInformation,
+    string memory _originFarmLatitude,
+    string memory _originFarmLongitude,
+    string memory _productNotes) public
   {
     // Add the new item as part of Harvest
     items[_upc] = Item({
       sku: sku,
+      upc: _upc,
       ownerID: msg.sender,
       originFarmerID: _originFarmerID,
       originFarmName: _originFarmName,
@@ -181,8 +171,8 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
       originFarmLatitude: _originFarmLatitude,
       originFarmLongitude: _originFarmLongitude,
       productID: sku + _upc,
-      productNotes: _productNotes,
       itemState: defaultState,
+      productNotes: _productNotes,
       productPrice: 0,
       distributorID: address(0),
       retailerID: address(0),
@@ -313,10 +303,9 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
   uint    itemUPC,
   address ownerID,
   address originFarmerID,
-  string  originFarmName,
-  string  originFarmInformation,
-  string  originFarmLatitude,
-  string  originFarmLongitude
+  string  memory originFarmName,
+  string  memory originFarmInformation,
+  string  memory originFarmLatitude
   )
   {
     // Assign values to the 8 parameters
@@ -328,34 +317,44 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
         originFarmerID = items[_upc].originFarmerID,
         originFarmName = items[_upc].originFarmName,
         originFarmInformation = items[_upc].originFarmInformation,
-        originFarmLatitude = items[_upc].originFarmLatitude,
-        originFarmLongitude = items[_upc].originFarmLongitude
+        originFarmLatitude = items[_upc].originFarmLatitude
       );
   }
 
   // Define a function 'fetchItemBufferTwo' that fetches the data
   function fetchItemBufferTwo(uint _upc) public view returns
   (
-  uint    itemSKU,
-  uint    itemUPC,
-  uint    productID,
-  string  productNotes,
-  uint    productPrice,
-  uint    itemState,
-  address distributorID,
-  address retailerID,
-  address consumerID
+    string  memory originFarmLongitude,
+    uint    itemSKU,
+    uint    itemUPC,
+    uint    productID,
+    string  memory productNotes
   )
   {
     // Assign values to the 9 parameters
     return
       (
+        originFarmLongitude = items[_upc].originFarmLongitude,
         itemSKU = items[_upc].sku,
         itemUPC = items[_upc].upc,
         productID = items[_upc].productID,
-        productNotes = items[_upc].productNotes,
+        productNotes = items[_upc].productNotes
+      );
+  }
+
+  function fetchItemBufferThree(uint _upc) public view returns
+  (
+    uint    productPrice,
+    uint    itemState,
+    address distributorID,
+    address retailerID,
+    address consumerID
+  )
+  {
+    return
+      (
         productPrice = items[_upc].productPrice,
-        itemState = items[_upc].itemState,
+        itemState = uint(items[_upc].itemState),
         distributorID = items[_upc].distributorID,
         retailerID = items[_upc].retailerID,
         consumerID = items[_upc].consumerID
