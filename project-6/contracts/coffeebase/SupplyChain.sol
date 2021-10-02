@@ -156,16 +156,22 @@ contract SupplyChain {
   function harvestItem(uint _upc, address _originFarmerID, string _originFarmName, string _originFarmInformation, string  _originFarmLatitude, string  _originFarmLongitude, string  _productNotes) public
   {
     // Add the new item as part of Harvest
-    items[_upc] = Item({sku: sku, ownerID: _originFarmerID, originFarmerID: _originFarmerID, originFarmName: _originFarmName, originFarmInformation: _originFarmInformation, originFarmLatitude: _originFarmLatitude, originFarmLongitude: _originFarmLongitude, productNotes: _productNotes, itemState: defaultState})
-    //items[_upc].sku = sku;
-    //items[_upc].ownerID = _originFarmerID;
-    //items[_upc].originFarmerID = _originFarmerID;
-    //items[_upc].originFarmName = _originFarmName;
-    //items[_upc].originFarmInformation = _originFarmInformation;
-    //items[_upc].originFarmLatitude = _originFarmLatitude;
-    //items[_upc].originFarmLongitude = _originFarmLongitude;
-    //items[_upc].productNotes = _productNotes;
-    //items[_upc].itemState = defaultState;
+    items[_upc] = Item({
+      sku: sku,
+      ownerID: msg.sender,
+      originFarmerID: _originFarmerID,
+      originFarmName: _originFarmName,
+      originFarmInformation: _originFarmInformation,
+      originFarmLatitude: _originFarmLatitude,
+      originFarmLongitude: _originFarmLongitude,
+      productID: sku + _upc,
+      productNotes: _productNotes,
+      itemState: defaultState,
+      productPrice: 0,
+      distributorID: address(0),
+      retailerID: address(0),
+      consumerID: address(0)
+    });
 
     // Increment sku
     sku = sku + 1;
@@ -178,7 +184,7 @@ contract SupplyChain {
   // Call modifier to check if upc has passed previous supply chain stage
   harvested(_upc)
   // Call modifier to verify caller of this function
-  verifyCaller(msg.sender)
+  verifyCaller(items[_upc].ownerID)
   {
     // Update the appropriate fields
     items[_upc].itemState = State.Processed;
@@ -191,7 +197,7 @@ contract SupplyChain {
   // Call modifier to check if upc has passed previous supply chain stage
   processed(_upc)
   // Call modifier to verify caller of this function
-  verifyCaller(msg.sender)
+  verifyCaller(items[_upc].ownerID)
   {
     // Update the appropriate fields
     items[_upc].itemState = State.Packed;
@@ -204,7 +210,7 @@ contract SupplyChain {
   // Call modifier to check if upc has passed previous supply chain stage
   packed(_upc)
   // Call modifier to verify caller of this function
-  verifyCaller(msg.sender)
+  verifyCaller(items[_upc].ownerID)
   {
     // Update the appropriate fields
     items[_upc].productPrice = _price;
@@ -230,7 +236,7 @@ contract SupplyChain {
     items[_upc].distributorID = msg.sender;
     items[_upc].itemState = State.Sold;
     // Transfer money to farmer
-    items[_upc].originFarmerID.transfer(msg.value);
+    payable(items[_upc].originFarmerID).transfer(items[_upc].productPrice);
     // emit the appropriate event
     emit Sold(_upc);
   }
@@ -241,7 +247,7 @@ contract SupplyChain {
     // Call modifier to check if upc has passed previous supply chain stage
     sold(_upc)
     // Call modifier to verify caller of this function
-    verifyCaller(_upc)
+    verifyCaller(items[_upc].ownerID)
     {
     // Update the appropriate fields
     items[_upc].itemState = State.Shipped;
@@ -253,26 +259,34 @@ contract SupplyChain {
   // Use the above modifiers to check if the item is shipped
   function receiveItem(uint _upc) public
     // Call modifier to check if upc has passed previous supply chain stage
-
+    shipped(_upc)
     // Access Control List enforced by calling Smart Contract / DApp
+    onlyRetailer()
     {
     // Update the appropriate fields - ownerID, retailerID, itemState
+    items[_upc].ownerID = msg.sender;
+    items[_upc].retailerID = msg.sender;
+    items[_upc].itemState = State.Received;
 
     // Emit the appropriate event
-
+    emit Received(_upc);
   }
 
   // Define a function 'purchaseItem' that allows the consumer to mark an item 'Purchased'
   // Use the above modifiers to check if the item is received
   function purchaseItem(uint _upc) public
     // Call modifier to check if upc has passed previous supply chain stage
-
+    received(_upc)
     // Access Control List enforced by calling Smart Contract / DApp
+    onlyConsumer()
     {
     // Update the appropriate fields - ownerID, consumerID, itemState
+    items[_upc].ownerID = msg.sender;
+    items[_upc].consumerID = msg.sender;
+    items[_upc].itemState = State.Purchased;
 
     // Emit the appropriate event
-
+    emit Purchased(_upc);
   }
 
   // Define a function 'fetchItemBufferOne' that fetches the data
@@ -288,20 +302,18 @@ contract SupplyChain {
   string  originFarmLongitude
   )
   {
-  // Assign values to the 8 parameters
-
-
-  return
-  (
-  itemSKU,
-  itemUPC,
-  ownerID,
-  originFarmerID,
-  originFarmName,
-  originFarmInformation,
-  originFarmLatitude,
-  originFarmLongitude
-  );
+    // Assign values to the 8 parameters
+    return
+      (
+        itemSKU = items[_upc].sku,
+        itemUPC = items[_upc].upc,
+        ownerID = items[_upc].ownerID,
+        originFarmerID = items[_upc].originFarmerID,
+        originFarmName = items[_upc].originFarmName,
+        originFarmInformation = items[_upc].originFarmInformation,
+        originFarmLatitude = items[_upc].originFarmLatitude,
+        originFarmLongitude = items[_upc].originFarmLongitude
+      );
   }
 
   // Define a function 'fetchItemBufferTwo' that fetches the data
@@ -319,19 +331,17 @@ contract SupplyChain {
   )
   {
     // Assign values to the 9 parameters
-
-
-  return
-  (
-  itemSKU,
-  itemUPC,
-  productID,
-  productNotes,
-  productPrice,
-  itemState,
-  distributorID,
-  retailerID,
-  consumerID
-  );
+    return
+      (
+        itemSKU = items[_upc].sku,
+        itemUPC = items[_upc].upc,
+        productID = items[_upc].productID,
+        productNotes = items[_upc].productNotes,
+        productPrice = items[_upc].productPrice,
+        itemState = items[_upc].itemState,
+        distributorID = items[_upc].distributorID,
+        retailerID = items[_upc].retailerID,
+        consumerID = items[_upc].consumerID
+      );
   }
 }
