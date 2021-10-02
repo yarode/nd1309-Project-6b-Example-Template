@@ -1,6 +1,14 @@
-pragma solidity ^0.4.24;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8.0;
+
+import "../coffeeaccesscontrol/ConsumerRole.sol";
+import "../coffeeaccesscontrol/DistributorRole.sol";
+import "../coffeeaccesscontrol/FarmerRole.sol";
+import "../coffeeaccesscontrol/RetailerRole.sol";
+import "../coffeecore/Ownable.sol";
+
 // Define a contract 'Supplychain'
-contract SupplyChain {
+contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole, Ownable {
 
   // Define 'owner'
   address owner;
@@ -85,7 +93,8 @@ contract SupplyChain {
     _;
     uint _price = items[_upc].productPrice;
     uint amountToReturn = msg.value - _price;
-    items[_upc].consumerID.transfer(amountToReturn);
+    address payable receiver = payable(items[_upc].consumerID);
+    receiver.transfer(amountToReturn);
   }
 
   // Define a modifier that checks if an item.state of a upc is Harvested
@@ -139,7 +148,14 @@ contract SupplyChain {
   // In the constructor set 'owner' to the address that instantiated the contract
   // and set 'sku' to 1
   // and set 'upc' to 1
-  constructor() public payable {
+  constructor()
+    public
+    payable
+    ConsumerRole()
+    DistributorRole()
+    FarmerRole()
+    RetailerRole()
+    Ownable() {
     owner = msg.sender;
     sku = 1;
     upc = 1;
@@ -236,7 +252,8 @@ contract SupplyChain {
     items[_upc].distributorID = msg.sender;
     items[_upc].itemState = State.Sold;
     // Transfer money to farmer
-    payable(items[_upc].originFarmerID).transfer(items[_upc].productPrice);
+    address payable receiver = payable(items[_upc].originFarmerID);
+    receiver.transfer(items[_upc].productPrice);
     // emit the appropriate event
     emit Sold(_upc);
   }

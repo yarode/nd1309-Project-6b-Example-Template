@@ -1,4 +1,5 @@
-pragma solidity ^0.4.24;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8.0;
 
 // Import the library 'Roles'
 import "./Roles.sol";
@@ -37,7 +38,7 @@ contract RetailerRole {
 
   // Define a function 'renounceRetailer' to renounce this role
   function renounceRetailer() public {
-    _removeRetailer(account);
+    _removeRetailer(msg.sender);
   }
 
   // Define an internal function '_addRetailer' to add this role, called by 'addRetailer'
