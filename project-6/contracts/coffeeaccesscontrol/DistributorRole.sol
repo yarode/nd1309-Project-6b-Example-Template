@@ -8,8 +8,8 @@ contract DistributorRole {
   using Roles for Roles.Role;
 
   // Define 2 events, one for Adding, and other for Removing
-  emit DistributorAdded(address indexed account);
-  emit DistributorRemoved(address indexed account);
+  event DistributorAdded(address indexed account);
+  event DistributorRemoved(address indexed account);
 
   // Define a struct 'distributors' by inheriting from 'Roles' library, struct Role
   Roles.Role private distributors;
