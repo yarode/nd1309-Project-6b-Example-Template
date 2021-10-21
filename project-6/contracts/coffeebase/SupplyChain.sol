@@ -299,13 +299,12 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
   // Define a function 'fetchItemBufferOne' that fetches the data
   function fetchItemBufferOne(uint _upc) public view returns
   (
-  uint    itemSKU,
-  uint    itemUPC,
-  address ownerID,
-  address originFarmerID,
-  string  memory originFarmName,
-  string  memory originFarmInformation,
-  string  memory originFarmLatitude
+    uint    itemSKU,
+    uint    itemUPC,
+    address ownerID,
+    address originFarmerID,
+    string memory  originFarmName,
+    string memory  originFarmInformation
   )
   {
     // Assign values to the 8 parameters
@@ -316,35 +315,39 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
         ownerID = items[_upc].ownerID,
         originFarmerID = items[_upc].originFarmerID,
         originFarmName = items[_upc].originFarmName,
-        originFarmInformation = items[_upc].originFarmInformation,
-        originFarmLatitude = items[_upc].originFarmLatitude
+        originFarmInformation = items[_upc].originFarmInformation
       );
   }
 
   // Define a function 'fetchItemBufferTwo' that fetches the data
   function fetchItemBufferTwo(uint _upc) public view returns
   (
-    string  memory originFarmLongitude,
     uint    itemSKU,
     uint    itemUPC,
+    string memory  originFarmLatitude,
+    string memory  originFarmLongitude,
     uint    productID,
-    string  memory productNotes
+    string  memory productNotes,
+    uint    productPrice
   )
   {
     // Assign values to the 9 parameters
     return
       (
-        originFarmLongitude = items[_upc].originFarmLongitude,
         itemSKU = items[_upc].sku,
         itemUPC = items[_upc].upc,
+        originFarmLatitude = items[_upc].originFarmLatitude,
+        originFarmLongitude = items[_upc].originFarmLongitude,
         productID = items[_upc].productID,
-        productNotes = items[_upc].productNotes
+        productNotes = items[_upc].productNotes,
+        productPrice = items[_upc].productPrice
       );
   }
 
   function fetchItemBufferThree(uint _upc) public view returns
   (
-    uint    productPrice,
+    uint    itemSKU,
+    uint    itemUPC,
     uint    itemState,
     address distributorID,
     address retailerID,
@@ -353,7 +356,8 @@ contract SupplyChain is ConsumerRole, DistributorRole, FarmerRole, RetailerRole,
   {
     return
       (
-        productPrice = items[_upc].productPrice,
+        itemSKU = items[_upc].sku,
+        itemUPC = items[_upc].upc,
         itemState = uint(items[_upc].itemState),
         distributorID = items[_upc].distributorID,
         retailerID = items[_upc].retailerID,
