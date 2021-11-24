@@ -12,6 +12,39 @@ The DApp User Interface when running should look like...
 
 ![truffle test](images/ftc_transaction_history.png)
 
+# Diagrams
+
+The following diagrams describe the dApp. All diagrams were made using Lucidchart.
+
+## Activity Diagram
+
+Activity based on the events emitted upon calling the relevant functions.
+
+![truffle test](images/activity.png)
+
+## Sequence Diagram
+
+![truffle test](images/sequence.png)
+
+## State Diagram
+
+State diagram which depicts the state of an Item through its lifetime.
+
+![truffle test](images/state.png)
+
+## Class Diagram
+
+![truffle test](images/class.png)
+
+# Rinkeby deployment
+
+The `SupplyChain.sol` contract was deployed to Rinkeby here:
+https://rinkeby.etherscan.io/tx/0x3e02ce303505d30e78c7da36233ab720cd7bdc333ca2b6a19b2738be0cac9b36
+
+The resulting contract can be found here:
+https://rinkeby.etherscan.io/address/0x2e0833557aeb6a151a4b113579b7967379f000aa
+
+The contracts were deployed through truffle by using the `truffle-hdwallet-provider` node module.
 
 ## Getting Started
 
@@ -21,20 +54,16 @@ These instructions will get you a copy of the project up and running on your loc
 
 Please make sure you've already installed ganache-cli, Truffle and enabled MetaMask extension in your browser.
 
-```
-Give examples (to be clarified)
-```
-
 ### Installing
 
-> The starter code is written for **Solidity v0.4.24**. At the time of writing, the current Truffle v5 comes with Solidity v0.5 that requires function *mutability* and *visibility* to be specified (please refer to Solidity [documentation](https://docs.soliditylang.org/en/v0.5.0/050-breaking-changes.html) for more details). To use this starter code, please run `npm i -g truffle@4.1.14` to install Truffle v4 with Solidity v0.4.24. 
+> The starter code is written for **Solidity v0.4.24**. At the time of writing, the current Truffle v5 comes with Solidity v0.5 that requires function *mutability* and *visibility* to be specified (please refer to Solidity [documentation](https://docs.soliditylang.org/en/v0.5.0/050-breaking-changes.html) for more details). To use this starter code, please run `npm i -g truffle@4.1.14` to install Truffle v4 with Solidity v0.4.24.
 
 A step by step series of examples that tell you have to get a development env running
 
 Clone this repository:
 
 ```
-git clone https://github.com/udacity/nd1309/tree/master/course-5/project-6
+git clone https://github.com/yarode/nd1309-Project-6b-Example-Template
 ```
 
 Change directory to ```project-6``` folder and install all requisite npm packages (as listed in ```package.json```):
@@ -82,7 +111,7 @@ Test smart contracts:
 truffle test
 ```
 
-All 10 tests should pass.
+All 9 tests should pass.
 
 ![truffle test](images/truffle_test.png)
 
@@ -95,18 +124,4 @@ npm run dev
 ## Built With
 
 * [Ethereum](https://www.ethereum.org/) - Ethereum is a decentralized platform that runs smart contracts
-* [IPFS](https://ipfs.io/) - IPFS is the Distributed Web | A peer-to-peer hypermedia protocol
-to make the web faster, safer, and more open.
 * [Truffle Framework](http://truffleframework.com/) - Truffle is the most popular development framework for Ethereum with a mission to make your life a whole lot easier.
-
-
-## Authors
-
-See also the list of [contributors](https://github.com/your/project/contributors.md) who participated in this project.
-
-## Acknowledgments
-
-* Solidity
-* Ganache-cli
-* Truffle
-* IPFS
